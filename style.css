@@ -202,7 +202,7 @@ img {
     filter: blur(6px);
 }
 
-/* إصلاح الميموري بوك */
+/* إعدادات الميموري بوك للشاشات الكبيرة */
 .memory-book,
 .book,
 .flipbook,
@@ -213,7 +213,7 @@ img {
     overflow: visible;
 }
 
-/* صفحات الكتاب */
+/* صفحات الكتاب للشاشات الكبيرة */
 .page img,
 .book img,
 .flipbook img {
@@ -223,18 +223,47 @@ img {
     border-radius: 20px;
 }
 
-/* الجوال */
+/* =================================================== */
+/* 🛠️ تعديلات الجوال المطور لإنهاء مشكلة التمدد والتعليق */
+/* =================================================== */
+
 @media (max-width: 768px) {
 
     body {
-        padding: 14px;
-        align-items: flex-start;
+        padding: 10px;
+        align-items: center; /* الحفاظ على توسيط الكتاب عمودياً وأفقياً */
     }
 
-    .memory-book,
-    .book,
-    .flipbook {
+    /* الحاوية الأساسية للكتاب لمنع تمدد الشاشة */
+    .memory-book {
+        width: 100%;
         max-width: 100%;
+        height: 310px; /* مساحة مناسبة لطول الكتاب بعد تصغير نسبته */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: visible;
+    }
+
+    /* السر هنا: الحفاظ على الأبعاد الأصلية (900x600) داخلياً وتصغيرها كصورة بالـ scale */
+    .flipbook, .book {
+        width: 900px !important;
+        height: 600px !important;
+        transform: scale(0.42) !important; /* يصغر الكتاب ليناسب شاشات الآيفون والجوالات الذكية بدقة */
+        transform-origin: center center;
+        flex-shrink: 0;
+        
+        /* تسريع المعالجة عبر كرت الشاشة لحل مشكلة التعليق والـ Lag */
+        will-change: transform;
+        transform: scale(0.42) translateZ(0) !important;
+    }
+
+    /* تسريع استجابة الصور أثناء التقليب في الجوال */
+    .page img, .flipbook img, .book img {
+        width: 100% !important;
+        height: 100% !important;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
     .lock-container {
@@ -254,8 +283,16 @@ img {
     }
 }
 
-/* جوالات صغيرة جدًا */
+/* الجوالات الصغيره جداً (مثل الأجهزة القديمة) */
 @media (max-width: 360px) {
+
+    .memory-book {
+        height: 260px; /* تقليل الارتفاع ليناسب الشاشة الصغيرة جداً */
+    }
+
+    .flipbook, .book {
+        transform: scale(0.36) translateZ(0) !important; /* تصغير إضافي متناسق لمنع خروج الأطراف */
+    }
 
     .lock-container {
         padding: 18px;
@@ -266,5 +303,4 @@ img {
         height: 52px;
         font-size: 16px;
     }
-
 }
