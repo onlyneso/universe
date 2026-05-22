@@ -279,23 +279,46 @@ body{background:#fbebf5;overflow-x:hidden;-webkit-tap-highlight-color:transparen
 }
 @keyframes hintPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
 
-/* ══ BOOK BOX ══ */
+/* ══ BOOK BOX - RESPONSIVE SCALE FIX ══ */
+.book-wrapper{
+  /* حاوية خارجية تتحكم في التكبير والتصغير */
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
 .book-box{
-  position:relative;
-  width:min(96vw,500px);
-  height:min(70vw,340px);
+  /* الأبعاد الأصلية ثابتة دائماً */
+  width:740px;
+  height:470px;
   perspective:2000px;
   transform-style:preserve-3d;
   flex-shrink:0;
   transition:transform 0.8s cubic-bezier(0.645,0.045,0.355,1);
-}
-@media(min-width:600px){
-  .book-box{
-    width:min(90vw,740px);
-    height:min(62vw,470px);
-  }
+  transform-origin:center center;
 }
 .book-box.closed{transform:translateX(-25%);}
+
+/* Scale ديناميكي على الجوال — يصغر الكتاب ليناسب عرض الشاشة */
+@media(max-width:759px){
+  .book-wrapper{
+    /* نحجز مساحة بنفس نسبة الكتاب */
+    height:0;
+    padding-bottom:calc(470 / 740 * 95vw);
+    position:relative;
+  }
+  .book-box{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(var(--book-scale,1));
+    transform-origin:center center;
+  }
+  .book-box.closed{
+    transform:translate(-50%,-50%) scale(var(--book-scale,1)) translateX(-25%);
+  }
+}
 
 .bk-open{position:absolute;inset:0;display:flex;border-radius:12px;transform-style:preserve-3d;}
 .bk-binder{
@@ -384,7 +407,15 @@ body{background:#fbebf5;overflow-x:hidden;-webkit-tap-highlight-color:transparen
   flex:1;display:flex;align-items:center;justify-content:center;
   border:2px dashed #f472b6;border-radius:10px;margin-top:8px;
   background:rgba(255,240,245,0.6);overflow:hidden;position:relative;min-height:60px;
+  /* تحسين الأداء: نعزل طبقة الرسم */
+  contain:strict;
 }
+
+/* إيقاف أنيميشن الوردة عند عدم الرؤية */
+#flower-space.paused *{
+  animation-play-state:paused !important;
+}
+
 #flower-space .flower-root{display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;overflow:hidden;perspective:600px;position:relative;}
 #flower-space *,#flower-space *::before,#flower-space *::after{box-sizing:border-box;margin:0;padding:0;}
 #flower-space{--dark-color:rgba(255,240,245,0);--pink-main:#ffb6c1;--pink-dark:#ff69b4;--pink-light:#ffe4e1;}
@@ -648,21 +679,24 @@ body{background:#fbebf5;overflow-x:hidden;-webkit-tap-highlight-color:transparen
   <button class="mem-back" onclick="sparkBurst(event);closeMemoryBook()">⬅ Back</button>
   <div class="book-scene">
     <button class="b-arrow" id="arrowL">←</button>
-    <div class="book-box closed" id="bookBox">
-      <div class="bk-open" id="bkOpen">
-        <div class="bk-binder"></div>
-        <div class="bk-left" id="bkLeft"><div id="leftContent"></div></div>
-        <div class="bk-page-flip" id="bkPageFlip">
-          <div class="flip-front" id="flipFront"></div>
-          <div class="flip-back" id="flipBack"></div>
+    <!-- ══ حاوية الـ Scale الجديدة ══ -->
+    <div class="book-wrapper">
+      <div class="book-box closed" id="bookBox">
+        <div class="bk-open" id="bkOpen">
+          <div class="bk-binder"></div>
+          <div class="bk-left" id="bkLeft"><div id="leftContent"></div></div>
+          <div class="bk-page-flip" id="bkPageFlip">
+            <div class="flip-front" id="flipFront"></div>
+            <div class="flip-back" id="flipBack"></div>
+          </div>
+          <div class="bk-right" id="bkRight"><div id="rightContent"></div></div>
         </div>
-        <div class="bk-right" id="bkRight"><div id="rightContent"></div></div>
-      </div>
-      <div class="bk-cover" id="bkCover">
-        <div class="cover-front" style="padding:0;background:none;">
-          <img src="cover.png" style="width:100%;height:100%;object-fit:cover;border-radius:0 16px 16px 0;">
+        <div class="bk-cover" id="bkCover">
+          <div class="cover-front" style="padding:0;background:none;">
+            <img src="cover.png" style="width:100%;height:100%;object-fit:cover;border-radius:0 16px 16px 0;">
+          </div>
+          <div class="cover-back"></div>
         </div>
-        <div class="cover-back"></div>
       </div>
     </div>
     <button class="b-arrow" id="arrowR">→</button>
@@ -673,6 +707,43 @@ body{background:#fbebf5;overflow-x:hidden;-webkit-tap-highlight-color:transparen
 
 <script>
 'use strict';
+
+/* ════════════════════════
+   RESPONSIVE BOOK SCALE
+════════════════════════ */
+function updateBookScale() {
+  const BOOK_W = 740;
+  const wrapper = document.querySelector('.book-wrapper');
+  const box = document.getElementById('bookBox');
+  if (!wrapper || !box) return;
+  const availW = wrapper.offsetWidth * 0.98;
+  const scale = Math.min(1, availW / BOOK_W);
+  box.style.setProperty('--book-scale', scale);
+  // على الشاشات الكبيرة نرجع الـ transform العادي
+  if (window.innerWidth >= 760) {
+    box.style.transform = box.classList.contains('closed') ? 'translateX(-25%)' : '';
+  }
+}
+window.addEventListener('resize', updateBookScale);
+// سيتم استدعاؤها بعد فتح صفحة الكتاب
+
+/* ════════════════════════
+   FLOWER PAUSE ON HIDDEN
+════════════════════════ */
+function watchFlowerVisibility() {
+  const fs = document.getElementById('flower-space');
+  if (!fs || !('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        fs.classList.remove('paused');
+      } else {
+        fs.classList.add('paused');
+      }
+    });
+  }, { threshold: 0.1 });
+  obs.observe(fs);
+}
 
 /* ════════════════════════
    SPARKLE CANVAS ENGINE
@@ -909,7 +980,12 @@ let curIdx = 0, isFlipping = false, bookOpen = false;
 function rend(el, html) {
   el.innerHTML = html;
   const fs = el.querySelector('#flower-space');
-  if (fs) { setTimeout(() => { fs.innerHTML = flowerHTML; }, 50); }
+  if (fs) {
+    setTimeout(() => {
+      fs.innerHTML = flowerHTML;
+      watchFlowerVisibility();
+    }, 50);
+  }
 }
 
 function initOpenBook() {
@@ -1008,6 +1084,8 @@ function showMemoryBook() {
   if (binder) binder.style.opacity = '0';
   bookOpen = false; isFlipping = false; curIdx = 0;
   initOpenBook(); updateHint();
+  // احسب الـ scale بعد ما تظهر الصفحة
+  requestAnimationFrame(updateBookScale);
 }
 
 function closeMemoryBook() {
