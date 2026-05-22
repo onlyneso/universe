@@ -1,0 +1,176 @@
+/* إعدادات الخطوط والخلفية الأساسية للموقع */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Fredoka', 'Segoe UI', sans-serif;
+    user-select: none; /* يمنع التحديد المزعج على شاشات الجوال */
+    -webkit-tap-highlight-color: transparent; /* يلغي الوميض الأزرق عند لمس الجوال */
+}
+
+body {
+    background-color: #FFF0F2; /* لون وردي باستيل ناعم جداً نفس الفيديو */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* خلفية النجوم اللطيفة التفاعلية */
+.stars-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bg-star {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #FFF;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* حاوية القفل الوردي بتصميم Pillow / Neumorphic */
+.lock-container {
+    background: #FFF;
+    padding: 30px;
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(255, 182, 193, 0.3);
+    width: 100%;
+    max-width: 380px; /* مقاس مثالي جداً ومريح للـ PC والجوال معاً */
+    text-align: center;
+    z-index: 10;
+    transition: all 0.5s ease-in-out;
+}
+
+.lock-header .heart-icon {
+    font-size: 32px;
+    animation: float 3s infinite ease-in-out;
+    margin-bottom: 10px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.lock-header h2 {
+    color: #FF8DA1;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.lock-header p {
+    color: #CCA4A9;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* خانات عرض النقاط السرية */
+.dots-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.dot {
+    width: 16px;
+    height: 16px;
+    border: 3px solid #FFE4E8;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.dot.active {
+    background-color: #FF8DA1;
+    border-color: #FF8DA1;
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(255, 141, 161, 0.5);
+}
+
+/* لوحة مفاتيح الجوال والبي سي الكيوت */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 15fr);
+    gap: 18px;
+    justify-items: center;
+}
+
+/* تصميم الأزرار الدائرية الناعمة والمجسمة */
+.key-btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: none;
+    background: #FFF5F6;
+    color: #FF8DA1;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 4px 4px 10px rgba(255, 182, 193, 0.2), 
+                -4px -4px 10px rgba(255, 255, 255, 0.9);
+    transition: all 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* تأثير الضغط اللطيف (يدعم الماوس واللمس باليد) */
+.key-btn:active {
+    transform: scale(0.92);
+    background: #FFE4E8;
+    box-shadow: inset 3px 3px 6px rgba(255, 182, 193, 0.3);
+}
+
+.clear-btn, .delete-btn {
+    font-size: 18px;
+    color: #CCA4A9;
+    background: #FFF;
+}
+
+/* أنيميشن الاهتزاز عند إدخال كود خاطئ */
+.shake-error {
+    animation: shake 0.4s ease-in-out;
+    border: 2px solid #FF8DA1;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+
+/* أنيميشن النجاح عند فتح البوابة */
+.unlock-success {
+    transform: scale(0.8);
+    opacity: 0;
+    filter: blur(10px);
+}
+
+/* تجاوب التصميم بالكامل مع الشاشات الصغيرة جداً للجوالات */
+@media (max-width: 360px) {
+    .lock-container {
+        padding: 20px;
+    }
+    .key-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 18px;
+    }
+}
