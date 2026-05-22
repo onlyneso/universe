@@ -224,51 +224,68 @@ img {
 }
 
 /* =================================================== */
-/* 🛠️ تعديلات الجوال المطور لإنهاء مشكلة التمدد والتعليق */
+/* 🛠️ تعديلات الجوال النهائية لحل مشكلة القص والتعليق */
 /* =================================================== */
 
 @media (max-width: 768px) {
 
     body {
-        padding: 10px;
-        align-items: center; /* الحفاظ على توسيط الكتاب عمودياً وأفقياً */
+        padding: 10px 4px !important;
+        align-items: center !important; 
     }
 
-    /* الحاوية الأساسية للكتاب لمنع تمدد الشاشة */
+    /* الحاوية الخارجية تمنع القص وتجبر الارتفاع على التناسق الحسابي الدقيق */
     .memory-book {
-        width: 100%;
-        max-width: 100%;
-        height: 310px; /* مساحة مناسبة لطول الكتاب بعد تصغير نسبته */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: visible;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: calc((100vw - 8px) * 0.666) !important; 
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: visible !important; /* يمنع قص الأطراف تماماً */
     }
 
-    /* السر هنا: الحفاظ على الأبعاد الأصلية (900x600) داخلياً وتصغيرها كصورة بالـ scale */
+    /* تصغير متجاوب وحيوي يطابق عرض شاشة الجوال بالضبط */
     .flipbook, .book {
         width: 900px !important;
         height: 600px !important;
-        transform: scale(0.42) !important; /* يصغر الكتاب ليناسب شاشات الآيفون والجوالات الذكية بدقة */
-        transform-origin: center center;
-        flex-shrink: 0;
+        transform: scale(calc((100vw - 12px) / 900)) translateZ(0) !important;
+        transform-origin: center center !important;
+        flex-shrink: 0 !important;
+        margin: 0 auto !important;
+        overflow: visible !important; /* يمنع طمس حواف الكتاب المفتوح */
         
-        /* تسريع المعالجة عبر كرت الشاشة لحل مشكلة التعليق والـ Lag */
+        /* تسريع الرسوميات عبر كرت الشاشة لتفادي أي تهنيج */
         will-change: transform;
-        transform: scale(0.42) translateZ(0) !important;
     }
 
-    /* تسريع استجابة الصور أثناء التقليب في الجوال */
+    /* إجبار إطارات المكتبة على عدم قص أي محتوى داخلي */
+    .page, .page-wrapper, .shadow {
+        overflow: visible !important;
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+    }
+
     .page img, .flipbook img, .book img {
         width: 100% !important;
         height: 100% !important;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
+        object-fit: fill !important; 
     }
 
+    /* 🔥 حل مشكلة تعليق صفحة الوردة وعدم انتقالها للـ صفحة التالية */
+    /* هذا الكود يستهدف الـ Canvas أو الـ SVG أو أي عنصر أنميشن للوردة ليمرر اللمس من خلاله */
+    canvas, svg, [class*="flower"], [id*="flower"], .animation-container {
+        pointer-events: none !important; /* يجعل إصبعك يمر عبر الوردة لتسحبي الصفحة بسلاسة */
+        max-width: 100% !important;
+        max-height: 100% !important;
+        transform: translateZ(0) !important; /* دعم أداء معالج الجوال */
+    }
+
+    /* حاوية القفل للجوال */
     .lock-container {
         padding: 24px;
         border-radius: 30px;
+        width: 90%;
     }
 
     .key-btn {
@@ -280,27 +297,5 @@ img {
     .bg-star {
         width: 4px;
         height: 4px;
-    }
-}
-
-/* الجوالات الصغيره جداً (مثل الأجهزة القديمة) */
-@media (max-width: 360px) {
-
-    .memory-book {
-        height: 260px; /* تقليل الارتفاع ليناسب الشاشة الصغيرة جداً */
-    }
-
-    .flipbook, .book {
-        transform: scale(0.36) translateZ(0) !important; /* تصغير إضافي متناسق لمنع خروج الأطراف */
-    }
-
-    .lock-container {
-        padding: 18px;
-    }
-
-    .key-btn {
-        width: 52px;
-        height: 52px;
-        font-size: 16px;
     }
 }
